@@ -3,6 +3,7 @@ package com.example.carros.domain;
 import com.example.carros.domain.dto.CarroDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,14 +32,33 @@ public class CarrosService {
        return rep.save(carro);
     }
 
-    public Carro update(Carro carro, Long id) {
-        return rep.save(carro);
+    public CarroDTO update(Carro carro, Long id) {
+        Assert.notNull(id,"Nao foi possivel atualizar o registro");
+        Optional<Carro>optional = rep.findById(id);
+        if (optional.isPresent()){
+            Carro db = optional.get();
+            db.setNome(carro.getNome());
+            db.setTipo(carro.getTipo());
+            System.out.println("Carro id "+db.getId() );
+
+            rep.save(db);
+
+            return CarroDTO.create(db);
+        }else {
+            return null;
+        }
     }
 
-    public void delete(Long id) {
-        Optional<CarroDTO>carro = getCarroById(id);
+    public boolean delete(Long id) {
         if (getCarroById(id).isPresent()){
             rep.deleteById(id);
+            return true;
         }
+        return false;
+    }
+
+    public CarroDTO insert(Carro carro) {
+        Assert.isNull(carro.getId(),"Nao foi possivel inserir o redistro");
+        return CarroDTO.create(rep.save(carro));
     }
 }
