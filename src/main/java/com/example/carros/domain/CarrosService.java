@@ -19,8 +19,8 @@ public class CarrosService {
     }
 
 
-    public Optional<Carro> getCarroById(Long id) {
-        return rep.findById(id);
+    public Optional<CarroDTO> getCarroById(Long id) {
+        return rep.findById(id).map(CarroDTO::new);
     }
 
     public List<CarroDTO> getCarroByTipo(String tipo) {
@@ -36,7 +36,7 @@ public class CarrosService {
     }
 
     public void delete(Long id) {
-        Optional<Carro>carro = getCarroById(id);
+        Optional<CarroDTO>carro = getCarroById(id);
         if (carro.isPresent()){
             rep.deleteById(id);
         }
