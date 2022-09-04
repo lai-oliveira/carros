@@ -2,6 +2,7 @@ package com.example.carros.api;
 
 import com.example.carros.domain.Carro;
 import com.example.carros.domain.CarrosService;
+import com.example.carros.domain.dto.CarroDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,26 +20,26 @@ public class CarrosController {
     private CarrosService service ;
 
     @GetMapping()
-   public ResponseEntity<Iterable<Carro>> get(){
+   public ResponseEntity<List<CarroDTO>> get(){
        return new ResponseEntity<>(service.getCarros(), HttpStatus.OK);
    }
 
    @GetMapping("/{id}")
    public ResponseEntity get(@PathVariable("id")Long id){
         Optional<Carro> carro = service.getCarroById(id);
-        if (carro.isPresent()){
-            return ResponseEntity.ok(carro.get());
-        }else {
-            return ResponseEntity.notFound().build();
-        }
+       return carro
+               .map(ResponseEntity::ok)
+               .orElse(ResponseEntity.notFound().build());
+
    }
 
     @GetMapping("/tipo/{tipo}")
-    public ResponseEntity getCarroByTipo(@PathVariable("tipo")String tipo){
-        List<Carro> carros = (List<Carro>) service.getCarroByTipo(tipo);
+    public ResponseEntity getCarrosByTipo(@PathVariable("tipo")String tipo){
+        List<CarroDTO> carros = service.getCarroByTipo(tipo);
         return carros.isEmpty()?
-                ResponseEntity.notFound().build():
+                ResponseEntity.noContent().build() :
                 ResponseEntity.ok(carros);
+
     }
 
     @PostMapping
@@ -57,5 +58,6 @@ public class CarrosController {
         return "Carro deletedo com sucesso";
 
     }
+
 
 }
